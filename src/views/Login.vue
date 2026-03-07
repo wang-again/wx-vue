@@ -86,17 +86,19 @@ const handleLogin = async () => {
 
     console.log('验证通过，正在请求后端...');
     // 连接后端服务器，使用 await 等待响应
-    const result = await axios.get('http://localhost:9090/admin/login', {
-      params: {
-        name: data.form.username,
-        password: data.form.password
+    const result = await axios.post('http://localhost:9090/admin/login', {
+      name: data.form.username,
+      password: data.form.password
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
       }
     });
 
     console.log('后端响应:', result);
 
     // 第三步：根据后端响应判断登录状态
-    if (result.data && result.data.code === 1001) {
+    if (result.data && result.data.code === 1002) {
       // 登录成功，跳转页面
       router.push("/home/dashboard");
     } else {

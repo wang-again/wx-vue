@@ -86,7 +86,7 @@ const handleLogin = async () => {
 
     console.log('验证通过，正在请求后端...');
     // 连接后端服务器，使用 await 等待响应
-    const result = await axios.get('http://localhost:9090/login', {
+    const result = await axios.get('http://localhost:9090/admin/login', {
       params: {
         name: data.form.username,
         password: data.form.password

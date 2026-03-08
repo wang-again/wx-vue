@@ -12,19 +12,19 @@
         active-text-color="#409eff"
         router
       >
-        <el-menu-item index="/dashboard">
+        <el-menu-item index="/home/dashboard">
           <el-icon><House /></el-icon>
           <span>首页</span>
         </el-menu-item>
-        <el-menu-item index="/users">
+        <el-menu-item index="/home/users">
           <el-icon><User /></el-icon>
           <span>用户信息</span>
         </el-menu-item>
-        <el-menu-item index="/reports">
+        <el-menu-item index="/home/reports">
           <el-icon><Document /></el-icon>
           <span>举报记录</span>
         </el-menu-item>
-        <el-menu-item index="/feedback">
+        <el-menu-item index="/home/feedback">
           <el-icon><ChatLineRound /></el-icon>
           <span>举报反馈</span>
         </el-menu-item>

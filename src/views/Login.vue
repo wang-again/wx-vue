@@ -31,6 +31,31 @@
           </el-input>
         </el-form-item>
         
+        <el-form-item prop="code">
+          <el-input 
+            size="large" 
+            v-model="data.form.code" 
+            autocomplete="off" 
+            placeholder="请输入验证码"
+            style="width: 60%"
+          >
+            <template #prefix>
+              <el-icon><SFinance /></el-icon>
+            </template>
+          </el-input>
+          <div style="width: 35%; float: right; height: 40px; line-height: 40px;">
+            <!-- 使用占位符图片 -->
+            <img 
+              :src="captchaUrl"
+              alt="验证码" 
+              style="cursor: pointer; height: 100%; width: 100%; object-fit: cover;"
+              @click="refreshCaptcha"
+            />
+          </div>
+        </el-form-item>
+        
+        <div style="clear: both;"></div>
+        
         <div>
           <el-button 
             style="width: 100%" 
@@ -48,20 +73,38 @@
 </template>
 
 <script setup>
-
 import { reactive, ref } from "vue";
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import { User, Lock } from '@element-plus/icons-vue';
 
 const router = useRouter(); 
 const formRef = ref();
 const loading = ref(false);
+// 验证码图片
+const captchaUrl = ref('');
+
+// 加载验证码
+const loadCaptcha = async () => {
+  try {
+    const response = await axios.get('/api/admin/captcha');
+    if (response.data && response.data.code === 1002) {
+      captchaUrl.value = response.data.data;
+    }
+  } catch (error) {
+    console.error('加载验证码失败:', error);
+    // 加载失败时使用占位符
+    captchaUrl.value = 'https://via.placeholder.com/120x40?text=验证码';
+  }
+};
+
+// 初始化加载验证码
+loadCaptcha();
 
 const data = reactive({
   form: {
     username: '',
-    password: ''
+    password: '',
+    code: ''
   },
   rules: {
     username: [
@@ -70,9 +113,18 @@ const data = reactive({
     ],
     password: [
       { required: true, message: '请输入密码', trigger: 'blur' }
+    ],
+    code: [
+      { required: true, message: '请输入验证码', trigger: 'blur' },
+      { min: 4, max: 4, message: '验证码长度为4个字符', trigger: 'blur' }
     ]
   }
 });
+
+const refreshCaptcha = () => {
+  // 刷新验证码图片
+  loadCaptcha();
+};
 
 const handleLogin = async () => {
   if (!formRef.value) return;
@@ -88,7 +140,8 @@ const handleLogin = async () => {
     // 连接后端服务器，使用 await 等待响应
     const result = await axios.post('/api/admin/login', {
       name: data.form.username,
-      password: data.form.password
+      password: data.form.password,
+      code: data.form.code
     }, {
       headers: {
         'Content-Type': 'application/json'

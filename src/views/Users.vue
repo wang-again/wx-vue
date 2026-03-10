@@ -55,10 +55,7 @@ const searchForm = reactive({
   nickname: ''
 })
 
-const userList = ref([
-  { id: 1, nickname: '张三', phone: '138****1234', createTime: '2024-01-01 10:00:00', status: 'active' },
-  { id: 2, nickname: '李四', phone: '139****5678', createTime: '2024-01-02 14:30:00', status: 'banned' }
-])
+const userList = ref([])
 
 const currentPage = ref(1)
 const pageSize = ref(10)

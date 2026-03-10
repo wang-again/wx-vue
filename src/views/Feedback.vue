@@ -45,10 +45,7 @@ const searchForm = reactive({
   reportId: ''
 })
 
-const feedbackList = ref([
-  { id: 1, reportId: 1, content: '已核实，用户李四确实发布了色情内容，已对其账号进行封禁处理。', createTime: '2024-03-01 16:00:00' },
-  { id: 2, reportId: 2, content: '正在调查中，如有进展将及时通知您。', createTime: '2024-03-02 16:30:00' }
-])
+const feedbackList = ref([])
 
 const currentPage = ref(1)
 const pageSize = ref(10)

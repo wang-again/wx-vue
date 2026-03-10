@@ -63,10 +63,7 @@ const searchForm = reactive({
   status: ''
 })
 
-const reportList = ref([
-  { id: 1, reporter: '张三', target: '李四', type: '色情内容', content: '用户李四在群聊中发布色情图片', createTime: '2024-03-01 10:00:00', status: 'pending' },
-  { id: 2, reporter: '王五', target: '赵六', type: '诈骗', content: '用户赵六诱导用户转账，涉嫌诈骗', createTime: '2024-03-02 14:30:00', status: 'processing' }
-])
+const reportList = ref([])
 
 const currentPage = ref(1)
 const pageSize = ref(10)

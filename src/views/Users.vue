@@ -66,11 +66,12 @@ const handleSearch = () => {
 }
 
 const handleReset = () => {
-  Object.keys(searchForm).forEach(key => {
-    searchForm[key] = ''
-  })
+  for (const key in searchForm) {
+    if (searchForm.hasOwnProperty(key)) {
+      searchForm[key as keyof typeof searchForm] = ''
+    }
+  }
 }
-
 const handleView = (row: any) => {
   console.log('查看用户', row)
 }

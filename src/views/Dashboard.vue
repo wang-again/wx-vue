@@ -1,4 +1,5 @@
 <template>
+  <div>
   <el-card>
     <template #header>
       <span>数据概览</span>
@@ -30,7 +31,7 @@
       </el-col>
     </el-row>
   </el-card>
-  >
+ 
   <el-card style="margin-top: 20px">
     <template #header>
       <div class="header-content">
@@ -47,7 +48,8 @@
     </template>
     <div ref="chartRef" class="chart-container"></div>
   </el-card>
-</>
+  </div>
+</template>
 
 <script setup lang="ts">
 import { onMounted, ref, onUnmounted } from 'vue'
@@ -72,55 +74,50 @@ const months = [
   { label: '12月', value: '12' }
 ]
 
-const monthData: Record<string, { dates: string[], values: number[] }> = {
-  '1': {
-    dates: ['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7'],
-    values: [85, 92, 78, 110, 95, 125, 105]
-  },
-  '2': {
-    dates: ['2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7'],
-    values: [98, 115, 88, 122, 108, 135, 118]
-  },
-  '3': {
-    dates: ['3.4', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10'],
-    values: [120, 132, 101, 134, 90, 230, 210]
-  },
-  '4': {
-    dates: ['4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7'],
-    values: [145, 158, 132, 160, 125, 175, 155]
-  },
-  '5': {
-    dates: ['5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7'],
-    values: [168, 182, 155, 190, 148, 205, 188]
-  },
-  '6': {
-    dates: ['6.1', '6.2', '6.3', '6.4', '6.5', '6.6', '6.7'],
-    values: [185, 198, 172, 205, 165, 220, 202]
-  },
-  '7': {
-    dates: ['7.1', '7.2', '7.3', '7.4', '7.5', '7.6', '7.7'],
-    values: [210, 225, 195, 235, 188, 250, 228]
-  },
-  '8': {
-    dates: ['8.1', '8.2', '8.3', '8.4', '8.5', '8.6', '8.7'],
-    values: [220, 235, 205, 245, 198, 260, 238]
-  },
-  '9': {
-    dates: ['9.1', '9.2', '9.3', '9.4', '9.5', '9.6', '9.7'],
-    values: [195, 208, 180, 218, 175, 230, 212]
-  },
-  '10': {
-    dates: ['10.1', '10.2', '10.3', '10.4', '10.5', '10.6', '10.7'],
-    values: [175, 188, 160, 195, 155, 210, 192]
-  },
-  '11': {
-    dates: ['11.1', '11.2', '11.3', '11.4', '11.5', '11.6', '11.7'],
-    values: [155, 168, 140, 175, 135, 190, 172]
-  },
-  '12': {
-    dates: ['12.1', '12.2', '12.3', '12.4', '12.5', '12.6', '12.7'],
-    values: [180, 195, 165, 205, 158, 225, 208]
+// 生成指定月份的完整日期数据
+const generateMonthData = (month: number): { dates: string[], values: number[] } => {
+  const dates: string[] = []
+  const values: number[] = []
+  
+  // 计算月份的天数
+  let daysInMonth: number
+  if (month === 2) {
+    // 检查是否为闰年
+    const year = new Date().getFullYear()
+    daysInMonth = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28
+  } else if ([4, 6, 9, 11].includes(month)) {
+    daysInMonth = 30
+  } else {
+    daysInMonth = 31
   }
+  
+  // 生成日期和对应的值
+  for (let day = 1; day <= daysInMonth; day++) {
+    dates.push(`${month}.${day}`)
+    // 生成随机但有趋势的值
+    const baseValue = 100 + (month - 1) * 10
+    const randomVariation = Math.floor(Math.random() * 50) - 25
+    const trend = Math.sin(day / daysInMonth * Math.PI * 2) * 30
+    values.push(Math.max(50, Math.floor(baseValue + randomVariation + trend)))
+  }
+  
+  return { dates, values }
+}
+
+// 生成所有月份的数据
+const monthData: Record<string, { dates: string[], values: number[] }> = {
+  '1': generateMonthData(1),
+  '2': generateMonthData(2),
+  '3': generateMonthData(3),
+  '4': generateMonthData(4),
+  '5': generateMonthData(5),
+  '6': generateMonthData(6),
+  '7': generateMonthData(7),
+  '8': generateMonthData(8),
+  '9': generateMonthData(9),
+  '10': generateMonthData(10),
+  '11': generateMonthData(11),
+  '12': generateMonthData(12)
 }
 
 const updateChart = (month: string) => {

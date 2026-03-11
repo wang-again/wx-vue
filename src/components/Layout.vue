@@ -39,8 +39,8 @@
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item>个人中心</el-dropdown-item>
-              <el-dropdown-item>退出登录</el-dropdown-item>
+              <el-dropdown-item @click="openUserCenter">个人中心</el-dropdown-item>
+              <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -49,12 +49,58 @@
         <router-view />
       </el-main>
     </el-container>
+    
+    <!-- 个人中心侧边弹窗 -->
+    <el-drawer
+      v-model="drawerVisible"
+      title="个人中心"
+      direction="rtl"
+      size="300px"
+    >
+      <div class="user-center-content">
+        <div class="user-avatar">
+          <el-avatar size="80" :src="'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'"></el-avatar>
+        </div>
+        <h3 style="text-align: center; margin-top: 20px">管理员信息</h3>
+        <el-form :model="adminInfo" label-width="80px" style="margin-top: 30px">
+          <el-form-item label="账户名称">
+            <el-input v-model="adminInfo.uName" disabled />
+          </el-form-item>
+          <el-form-item label="密码">
+            <el-input v-model="adminInfo.uPwd" type="password" disabled />
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-drawer>
   </el-container>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { ref, reactive } from 'vue'
 const route = useRoute()
+const router = useRouter()
+
+// 侧边弹窗状态
+const drawerVisible = ref(false)
+
+// 管理员信息
+const adminInfo = reactive({
+  uName: 'admin',
+  uPwd: '123456' // 实际应用中应该从后端获取
+})
+
+// 打开个人中心
+const openUserCenter = () => {
+  drawerVisible.value = true
+}
+
+// 退出登录
+const handleLogout = () => {
+  // 清除登录状态（实际应用中可能需要清除token等）
+  // 导航到登录页面
+  router.push('/login')
+}
 </script>
 
 <style scoped>
@@ -62,5 +108,14 @@ const route = useRoute()
   display: flex;
   align-items: center;
   cursor: pointer;
+}
+
+.user-center-content {
+  padding: 20px;
+}
+
+.user-avatar {
+  display: flex;
+  justify-content: center;
 }
 </style>

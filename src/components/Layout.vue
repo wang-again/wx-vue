@@ -69,15 +69,43 @@
           <el-form-item label="密码">
             <el-input v-model="adminInfo.uPwd" type="password" disabled />
           </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="openChangePasswordDialog" style="width: 100%">修改密码</el-button>
+          </el-form-item>
         </el-form>
       </div>
     </el-drawer>
+    
+    <!-- 修改密码对话框 -->
+    <el-dialog
+      v-model="changePasswordDialogVisible"
+      title="修改密码"
+      width="400px"
+    >
+      <el-form :model="changePasswordForm" :rules="changePasswordRules" ref="changePasswordFormRef" label-width="80px">
+        <el-form-item label="旧密码" prop="oldPassword">
+          <el-input v-model="changePasswordForm.oldPassword" type="password" show-password />
+        </el-form-item>
+        <el-form-item label="新密码" prop="newPassword">
+          <el-input v-model="changePasswordForm.newPassword" type="password" show-password />
+        </el-form-item>
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input v-model="changePasswordForm.confirmPassword" type="password" show-password />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="changePasswordDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleChangePassword" :loading="changePasswordLoading">确定</el-button>
+      </template>
+    </el-dialog>
   </el-container>
 </template>
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { ref, reactive } from 'vue'
+import axios from 'axios'
+import { ElMessage } from 'element-plus'
 const route = useRoute()
 const router = useRouter()
 
@@ -100,6 +128,74 @@ const handleLogout = () => {
   // 清除登录状态（实际应用中可能需要清除token等）
   // 导航到登录页面
   router.push('/login')
+}
+
+// 修改密码相关
+const changePasswordDialogVisible = ref(false)
+const changePasswordFormRef = ref()
+const changePasswordLoading = ref(false)
+
+const changePasswordForm = reactive({
+  oldPassword: '',
+  newPassword: '',
+  confirmPassword: ''
+})
+
+const validateConfirmPassword = (rule: any, value: any, callback: any) => {
+  if (value !== changePasswordForm.newPassword) {
+    callback(new Error('两次输入的密码不一致'))
+  } else {
+    callback()
+  }
+}
+
+const changePasswordRules = {
+  oldPassword: [
+    { required: true, message: '请输入旧密码', trigger: 'blur' }
+  ],
+  newPassword: [
+    { required: true, message: '请输入新密码', trigger: 'blur' },
+    { min: 6, message: '密码长度至少6位', trigger: 'blur' }
+  ],
+  confirmPassword: [
+    { required: true, message: '请确认新密码', trigger: 'blur' },
+    { validator: validateConfirmPassword, trigger: 'blur' }
+  ]
+}
+
+const openChangePasswordDialog = () => {
+  changePasswordDialogVisible.value = true
+  changePasswordForm.oldPassword = ''
+  changePasswordForm.newPassword = ''
+  changePasswordForm.confirmPassword = ''
+}
+
+const handleChangePassword = async () => {
+  if (!changePasswordFormRef.value) return
+  
+  try {
+    await changePasswordFormRef.value.validate()
+    changePasswordLoading.value = true
+    
+    const result = await axios.post('/api/admin/update-passwords', {
+      oldPassword: changePasswordForm.oldPassword,
+      newPassword: changePasswordForm.newPassword
+    })
+    
+    if (result.data && result.data.code === 1002) {
+      ElMessage.success('密码修改成功')
+      changePasswordDialogVisible.value = false
+      // 更新本地显示的密码
+      adminInfo.uPwd = changePasswordForm.newPassword
+    } else {
+      ElMessage.error(result.data?.msg || '密码修改失败')
+    }
+  } catch (error) {
+    console.error('修改密码失败:', error)
+    ElMessage.error('密码修改失败，请稍后重试')
+  } finally {
+    changePasswordLoading.value = false
+  }
 }
 </script>
 
